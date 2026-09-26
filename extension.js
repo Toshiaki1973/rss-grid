@@ -313,7 +313,8 @@ function getHtml(webview) {
   .card { break-inside: avoid; margin-bottom: var(--gap); background: var(--vscode-editorWidget-background, var(--vscode-sideBar-background));
     border: 1px solid var(--vscode-panel-border); cursor: pointer; display: block; overflow: hidden; transition: transform .12s, box-shadow .12s; }
   .card:hover { transform: translateY(-2px); box-shadow: 0 4px 14px rgba(0,0,0,.25); }
-  .card .img { width: 100%; aspect-ratio: 16/10; object-fit: cover; display: block; background: var(--vscode-editor-inactiveSelectionBackground); }
+  .card .img { width: 100%; aspect-ratio: 16/10; object-fit: cover; display: block; background: var(--vscode-editor-inactiveSelectionBackground); opacity: 0; transition: opacity .25s; }
+  .card .img.ok { opacity: 1; }
   .card.feature .img { aspect-ratio: 4/3; }
   .card .body { padding: 10px 12px 0; }
   .card h2 { font-size: 13px; line-height: 1.45; margin: 0 0 6px; font-weight: 600; }
@@ -388,14 +389,23 @@ function getHtml(webview) {
       const feature = it.image && i % 7 === 0;
       const isNew = it.date && now - it.date < 3 * 3600 * 1000;
       return '<article class="card' + (feature ? ' feature' : '') + '" data-url="' + esc(it.link) + '" title="' + esc(it.title) + '">' +
-        (it.image ? '<img class="img" loading="lazy" referrerpolicy="no-referrer" src="' + esc(it.image.replace(/^http:/, 'https:')) + '" alt="">' : '') +
+        (it.image ? '<img class="img" decoding="async" referrerpolicy="no-referrer" data-orig="' + esc(it.image) + '" src="' + esc(it.image.replace(/^http:/, 'https:')) + '" alt="">' : '') +
         '<div class="body"><h2>' + (isNew ? '<span class="new">NEW</span>' : '') + esc(it.title) + '</h2>' +
         (it.summary ? '<p>' + esc(it.summary) + '</p>' : '') + '</div>' +
         '<div class="foot"><span class="src">' + esc(it.source) + (it.date ? ' ・ ' + fmt(it.date) : '') + '</span><span class="more">Read More</span></div>' +
         '</article>';
     }).join('');
     // 画像の読み込みに失敗したら画像枠ごと消す
-    $('grid').querySelectorAll('img').forEach(img => img.addEventListener('error', () => img.remove(), { once: true }));
+    // 読めたらフェードイン。httpsで失敗したら元URLで1回だけ再試行、それもダメなら画像枠ごと消す
+    $('grid').querySelectorAll('img').forEach(img => {
+      const onLoad = () => (img.naturalWidth < 40 ? img.remove() : img.classList.add('ok'));
+      img.addEventListener('load', onLoad);
+      img.addEventListener('error', () => {
+        if (img.dataset.orig && img.src !== img.dataset.orig) img.src = img.dataset.orig;
+        else img.remove();
+      });
+      if (img.complete && img.naturalWidth) onLoad();
+    });
   }
 
   $('tabs').addEventListener('click', e => {
