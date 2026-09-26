@@ -2,6 +2,8 @@
 
 VS Code の中で RSS / Atom フィードを **画像付きグリッド** で読むリーダー拡張です。
 
+![RSS Grid](screenshot.png)
+
 ## 使い方
 
 - ステータスバーの `RSS`、またはコマンド `RSS Grid: 開く` で表示
