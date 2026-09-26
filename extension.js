@@ -17,8 +17,14 @@ function activate(context) {
     vscode.commands.registerCommand('rssGrid.open', () => openPanel(context)),
     vscode.commands.registerCommand('rssGrid.refresh', () => refresh(context)),
     vscode.commands.registerCommand('rssGrid.addFeed', () => addFeed(context)),
-    vscode.commands.registerCommand('rssGrid.editFeeds', () =>
-      vscode.commands.executeCommand('workbench.action.openSettingsJson', { revealSetting: { key: 'rssGrid.feeds' } })),
+    vscode.commands.registerCommand('rssGrid.editFeeds', async () => {
+      // 未設定だとsettings.jsonに何も出ないので、既定の一覧を書き出してから開く
+      const cfg = vscode.workspace.getConfiguration('rssGrid');
+      if (cfg.inspect('feeds')?.globalValue === undefined) {
+        await cfg.update('feeds', cfg.get('feeds'), vscode.ConfigurationTarget.Global);
+      }
+      vscode.commands.executeCommand('workbench.action.openSettingsJson', { revealSetting: { key: 'rssGrid.feeds' } });
+    }),
     vscode.workspace.onDidChangeConfiguration(e => {
       if (e.affectsConfiguration('rssGrid.autoRefreshMinutes')) setupTimer(context);
       if (e.affectsConfiguration('rssGrid.feeds') && panel) refresh(context);
