@@ -2,7 +2,7 @@
   "name": "rss-grid",
   "displayName": "RSS Grid",
   "description": "RSSフィードを画像付きグリッドで表示するリーダー",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "publisher": "toshiaki1973",
   "license": "MIT",
   "engines": { "vscode": "^1.90.0" },

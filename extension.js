@@ -360,6 +360,13 @@ function getHtml(webview) {
     return d.getFullYear() + '.' + String(d.getMonth() + 1).padStart(2, '0') + '.' + String(d.getDate()).padStart(2, '0');
   };
   const save = () => vscode.setState(state);
+  // 出たばかりの記事はCDN側で画像が未生成のことがあり(Yahoo等)白い仮画像が返ってキャッシュされる。
+  // 公開30分以内の記事は更新ごとにURLを変えて取り直す
+  const imgSrc = (it, now) => {
+    const u = it.image.replace(/^http:/, 'https:');
+    if (!it.date || now - it.date > 30 * 60 * 1000) return u;
+    return u + (u.includes('?') ? '&' : '?') + '_rg=' + data.fetchedAt;
+  };
 
   function render() {
     if (!data) return;
@@ -389,7 +396,7 @@ function getHtml(webview) {
       const feature = it.image && i % 7 === 0;
       const isNew = it.date && now - it.date < 3 * 3600 * 1000;
       return '<article class="card' + (feature ? ' feature' : '') + '" data-url="' + esc(it.link) + '" title="' + esc(it.title) + '">' +
-        (it.image ? '<img class="img" decoding="async" referrerpolicy="no-referrer" data-orig="' + esc(it.image) + '" src="' + esc(it.image.replace(/^http:/, 'https:')) + '" alt="">' : '') +
+        (it.image ? '<img class="img" decoding="async" referrerpolicy="no-referrer" data-orig="' + esc(it.image) + '" src="' + esc(imgSrc(it, now)) + '" alt="">' : '') +
         '<div class="body"><h2>' + (isNew ? '<span class="new">NEW</span>' : '') + esc(it.title) + '</h2>' +
         (it.summary ? '<p>' + esc(it.summary) + '</p>' : '') + '</div>' +
         '<div class="foot"><span class="src">' + esc(it.source) + (it.date ? ' ・ ' + fmt(it.date) : '') + '</span><span class="more">Read More</span></div>' +
