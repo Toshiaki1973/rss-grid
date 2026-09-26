@@ -1,0 +1,58 @@
+{
+  "name": "rss-grid",
+  "displayName": "RSS Grid",
+  "description": "RSSフィードを画像付きグリッドで表示するリーダー",
+  "version": "0.1.0",
+  "publisher": "toshiaki1973",
+  "license": "MIT",
+  "engines": { "vscode": "^1.90.0" },
+  "categories": ["Other"],
+  "main": "./extension.js",
+  "activationEvents": ["onStartupFinished"],
+  "contributes": {
+    "commands": [
+      { "command": "rssGrid.open", "title": "RSS Grid: 開く" },
+      { "command": "rssGrid.refresh", "title": "RSS Grid: 更新" },
+      { "command": "rssGrid.addFeed", "title": "RSS Grid: フィードを追加" },
+      { "command": "rssGrid.editFeeds", "title": "RSS Grid: フィード一覧を編集(settings.json)" }
+    ],
+    "configuration": {
+      "title": "RSS Grid",
+      "properties": {
+        "rssGrid.feeds": {
+          "type": "array",
+          "description": "購読するフィード。category はタブ名になる",
+          "items": {
+            "type": "object",
+            "properties": {
+              "label": { "type": "string" },
+              "url": { "type": "string" },
+              "category": { "type": "string" }
+            },
+            "required": ["url"]
+          },
+          "default": [
+            { "label": "NHKニュース", "url": "https://www.nhk.or.jp/rss/news/cat0.xml", "category": "ニュース" },
+            { "label": "Yahoo!ニューストピックス", "url": "https://news.yahoo.co.jp/rss/topics/top-picks.xml", "category": "ニュース" },
+            { "label": "CNN.co.jp", "url": "https://feeds.cnn.co.jp/rss/cnn/cnn.rdf", "category": "ニュース" },
+            { "label": "AI Watch", "url": "https://ai.watch.impress.co.jp/data/rss/1.0/aiw/feed.rdf", "category": "テック" },
+            { "label": "ギズモード・ジャパン", "url": "https://www.gizmodo.jp/index.xml", "category": "テック" },
+            { "label": "IGDA日本", "url": "https://igda.jp/feed/", "category": "ゲーム" },
+            { "label": "gamebiz", "url": "https://gamebiz.jp/feed.rss", "category": "ゲーム" },
+            { "label": "Kotaku", "url": "https://kotaku.com/feed", "category": "ゲーム" },
+            { "label": "4Gamer", "url": "https://www.4gamer.net/rss/index.xml", "category": "ゲーム" },
+            { "label": "AUTOMATON", "url": "https://automaton-media.com/feed/", "category": "ゲーム" },
+            { "label": "GameMakers", "url": "https://gamemakers.jp/category/news/feed/", "category": "ゲーム" },
+            { "label": "はちま起稿", "url": "http://blog.esuteru.com/index.rdf", "category": "ゲーム" },
+            { "label": "Yahoo!スポーツ", "url": "https://news.yahoo.co.jp/rss/categories/sports.xml", "category": "スポーツ" },
+            { "label": "SPICE 音楽", "url": "http://spice-api.eplus.jp/rss/articles/1/latest.xml?encoded=1", "category": "エンタメ" },
+            { "label": "SPICE イベント", "url": "http://spice-api.eplus.jp/rss/articles/5/latest.xml?encoded=1", "category": "エンタメ" }
+          ]
+        },
+        "rssGrid.itemsPerFeed": { "type": "number", "default": 20, "description": "1フィードあたりの最大記事数" },
+        "rssGrid.autoRefreshMinutes": { "type": "number", "default": 15, "description": "自動更新の間隔(分)。0でオフ" },
+        "rssGrid.fetchOgImage": { "type": "boolean", "default": true, "description": "RSSに画像が無い記事は記事ページのog:imageを取りに行く" }
+      }
+    }
+  }
+}
